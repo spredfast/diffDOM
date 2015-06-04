@@ -636,17 +636,8 @@
     findOuterDiff: function (t1, t2, route) {
       var k;
 
-      if (t1.nodeName != t2.nodeName) {
-        k = {};
-        k[ACTION] = REPLACE_ELEMENT;
-        k[OLD_VALUE] = nodeToObj(t1);
-        k[NEW_VALUE] = nodeToObj(t2);
-        k[ROUTE] = route;
-        return [new Diff(k)];
-      }
-
       // If we're comparing two IFRAMEs and the name changes, force a replacement
-      if (t1.nodeName === t2.nodeName && t1.nodeName === 'IFRAME' && t1.name !== t2.name) {
+      if (t1.nodeName != t2.nodeName || (t1.nodeName === t2.nodeName && t1.nodeName === 'IFRAME' && t1.name !== t2.name)) {
         k = {};
         k[ACTION] = REPLACE_ELEMENT;
         k[OLD_VALUE] = nodeToObj(t1);
