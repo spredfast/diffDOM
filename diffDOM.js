@@ -180,7 +180,7 @@
         } else if (!(options[i].selected) && clonedOptions[i].selected) {
           clonedOptions[i].selected = false;
         }
-      }      
+      }
       if (node.selected && !(clonedNode.selected)) {
         clonedNode.selected = true;
       } else if (!(node.selected) && clonedNode.selected) {
@@ -635,7 +635,7 @@
     },
     findOuterDiff: function (t1, t2, route) {
       var k;
-      
+
       if (t1.nodeName != t2.nodeName) {
         k = {};
         k[ACTION] = REPLACE_ELEMENT;
@@ -644,7 +644,17 @@
         k[ROUTE] = route;
         return [new Diff(k)];
       }
-      
+
+      // If we're comparing two IFRAMEs and the name changes, force a replacement
+      if (t1.nodeName === t2.nodeName && t1.nodeName === 'IFRAME' && t1.name !== t2.name) {
+        k = {};
+        k[ACTION] = REPLACE_ELEMENT;
+        k[OLD_VALUE] = nodeToObj(t1);
+        k[NEW_VALUE] = nodeToObj(t2);
+        k[ROUTE] = route;
+        return [new Diff(k)];
+      }
+
       var slice = Array.prototype.slice,
         byName = function (a, b) {
           return a.name > b.name;
@@ -674,7 +684,7 @@
         k[NEW_VALUE] = t2.checked;
         k[ROUTE] = route;
         diffs.push(new Diff(k));
-      }  
+      }
 
       attr1.forEach(function (attr) {
         var pos = find(attr, attr2),
@@ -707,7 +717,7 @@
           k[ROUTE] = route;
           k[OLD_VALUE] = t1.data;
           k[NEW_VALUE] = t2.data;
-          diffs.push(new Diff(k));          
+          diffs.push(new Diff(k));
       }
       if (diffs.length > 0) {
         return diffs;
@@ -720,9 +730,9 @@
         k[NAME] = attr.name;
         k[VALUE] = attr.value;
         diffs.push(new Diff(k));
-        
+
       });
-      
+
       if ((t1.selected || t2.selected) && t1.selected !== t2.selected) {
         if (diffs.length > 0) {
             return diffs;
@@ -733,8 +743,8 @@
         k[NEW_VALUE] = t2.selected;
         k[ROUTE] = route;
         diffs.push(new Diff(k));
-      }      
-      
+      }
+
       return diffs;
     },
     findInnerDiff: function (t1, t2, route) {
@@ -742,7 +752,7 @@
         mappings = subtrees.length,
         k;
       // no correspondence whatsoever
-      // if t1 or t2 contain differences that are not text nodes, return a diff. 
+      // if t1 or t2 contain differences that are not text nodes, return a diff.
 
       // two text nodes with differences
       if (mappings === 0) {
@@ -873,7 +883,7 @@
       } else if (diff[ACTION] === MODIFY_SELECTED) {
         if (!node || typeof node.selected === 'undefined')
           return false;
-        node.selected = diff[NEW_VALUE];     
+        node.selected = diff[NEW_VALUE];
       } else if (diff[ACTION] === MODIFY_TEXT_ELEMENT) {
         if (!node || node.nodeType != 3)
           return false;
@@ -966,7 +976,7 @@
         this.applyDiff(tree, diff);
       } else if (diff[ACTION] === MODIFY_DATA) {
         swap(diff, OLD_VALUE, NEW_VALUE);
-        this.applyDiff(tree, diff);        
+        this.applyDiff(tree, diff);
       } else if (diff[ACTION] === MODIFY_CHECKED) {
         swap(diff, OLD_VALUE, NEW_VALUE);
         this.applyDiff(tree, diff);
